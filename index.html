@@ -304,6 +304,155 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://geelaro.github.io/post/2017/Several-sorting-methods-of-Java-implementation.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="geelaro">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/cat.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Going to Fly">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/post/2017/Several-sorting-methods-of-Java-implementation.html" itemprop="url">Java实现的几种排序方法</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-10T13:02:09+08:00">
+                2017-10-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h3 id="1-插入排序"><a href="#1-插入排序" class="headerlink" title="1. 插入排序"></a>1. 插入排序</h3><h4 id="1-1-基本思想"><a href="#1-1-基本思想" class="headerlink" title="1.1 基本思想"></a>1.1 基本思想</h4><p>在要排序的一组数中，假设前面(n-1) [n&gt;=2]个数已经是排好顺序的，现在要把第n个数插到前面的有序数中，使得这n个数也是排好顺序的。如此反复循环，直到全部排好顺序。</p>
+<h4 id="1-2-实现"><a href="#1-2-实现" class="headerlink" title="1.2 实现"></a>1.2 实现</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* 插入排序</div><div class="line">* @param array</div><div class="line">*/</div><div class="line">public static void insertSort(int[] a) &#123;</div><div class="line">    int temp = 0;</div><div class="line">	int n = a.length;</div><div class="line"></div><div class="line">	for (int i = 1; i &lt; n; i++) &#123;</div><div class="line">		for (int j = i; j &gt; 0; j--) &#123;</div><div class="line">			if (a[j] &lt; a[j - 1]) &#123;</div><div class="line">				temp = a[j];</div><div class="line">				a[j] = a[j - 1];</div><div class="line">				a[j - 1] = temp;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line"></div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="2-冒泡排序"><a href="#2-冒泡排序" class="headerlink" title="2. 冒泡排序"></a>2. 冒泡排序</h3><h4 id="2-1-基本原理"><a href="#2-1-基本原理" class="headerlink" title="2.1 基本原理"></a>2.1 基本原理</h4><p>在要排序的一组数中，对当前还未排好序的范围内的全部数，自上而下对相邻的两个数依次进行比较和调整，让较大的数往下沉，较小的往上冒。即：每当两相邻的数比较后发现它们的排序与排序要求相反时，就将它们互换。</p>
+<h4 id="2-2-实现"><a href="#2-2-实现" class="headerlink" title="2.2 实现"></a>2.2 实现</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* 冒泡排序</div><div class="line">* @param array</div><div class="line">*/</div><div class="line">public static void bubbleSort(int array[]) &#123;</div><div class="line">	int temp = 0;</div><div class="line">	int n = array.length;</div><div class="line">	for (int i = 0; i &lt; n - 1; i++) &#123;</div><div class="line">		for (int j = 0; j &lt; n - i - 1; j++) &#123;</div><div class="line">			if (array[j] &gt; array[j + 1]) &#123;</div><div class="line">				temp = array[j + 1];</div><div class="line">				array[j + 1] = array[j];</div><div class="line">				array[j] = temp;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="3-选择排序"><a href="#3-选择排序" class="headerlink" title="3. 选择排序"></a>3. 选择排序</h3><h4 id="3-1-基本原理"><a href="#3-1-基本原理" class="headerlink" title="3.1 基本原理"></a>3.1 基本原理</h4><p>在要排序的一组数中，选出最小的一个数与第一个位置的数交换；然后在剩下的数当中再找最小的与第二个位置的数交换，如此循环到倒数第二个数和最后一个数比较为止。</p>
+<h4 id="3-2-实现"><a href="#3-2-实现" class="headerlink" title="3.2 实现"></a>3.2 实现</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line">* 选择排序</div><div class="line">* @param a</div><div class="line">*/</div><div class="line">public static void selectSort(int[] a) &#123;</div><div class="line">	int n = a.length;</div><div class="line">	int minIndex;</div><div class="line"></div><div class="line">	for (int i = 0; i &lt; n-1; i++) &#123;</div><div class="line">		minIndex = i; // 将当前下标定义为最小值下标</div><div class="line">		for (int j = i + 1; j &lt; n; j++) &#123;</div><div class="line">			if (a[minIndex] &gt; a[j]) &#123;</div><div class="line">				minIndex = j;</div><div class="line">			&#125;</div><div class="line">		&#125;</div><div class="line">		</div><div class="line">		if (minIndex != i) &#123;</div><div class="line">			int temp = a[minIndex];</div><div class="line">			a[minIndex] = a[i];</div><div class="line">			a[i] = temp;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="4-快速排序"><a href="#4-快速排序" class="headerlink" title="4. 快速排序"></a>4. 快速排序</h3><h4 id="4-1-基本思想"><a href="#4-1-基本思想" class="headerlink" title="4.1 基本思想"></a>4.1 基本思想</h4><p>选择一个基准元素,通常选择第一个元素或者最后一个元素,通过一趟扫描，将待排序列分成两部分,一部分比基准元素小,一部分大于等于基准元素,此时基准元素在其排好序后的正确位置,然后再用同样的方法递归地排序划分的两部分。</p>
+<h4 id="4-2-实现"><a href="#4-2-实现" class="headerlink" title="4.2 实现"></a>4.2 实现</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">/**</div><div class="line"> * 快速排序</div><div class="line"> * @param a</div><div class="line"> */</div><div class="line">public static void quickSort(int[] a, int low, int high) &#123;</div><div class="line"></div><div class="line">	if (a.length &lt;= 0 || (high - low) &lt;= 0) &#123;</div><div class="line">		return;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	int mid = low; // 数组第一个作为准值</div><div class="line"></div><div class="line">	/** */</div><div class="line">	for (int i = low + 1; i &lt;= high; i++) &#123;</div><div class="line">		if (a[i] &lt; a[low]) &#123;</div><div class="line">			int temp = a[++mid];</div><div class="line">			a[mid] = a[i];</div><div class="line">			a[i] = temp;</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	int temp = a[mid];</div><div class="line">	a[mid] = a[low];</div><div class="line">	a[low] = temp;</div><div class="line"></div><div class="line">	quickSort(a, low, mid - 1);</div><div class="line">	quickSort(a, mid + 1, high);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://geelaro.github.io/post/2017/hello-world.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -563,162 +712,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://geelaro.github.io/post/2017/something-about-it.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="geelaro">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/cat.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Going to Fly">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/post/2017/something-about-it.html" itemprop="url">something about it</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-18T22:59:34+08:00">
-                2017-09-18
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/AndroidDev/" itemprop="url" rel="index">
-                    <span itemprop="name">AndroidDev</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h3 id="AndroidBlog"><a href="#AndroidBlog" class="headerlink" title="AndroidBlog"></a>AndroidBlog</h3><pre><code>private static final UriMatcher sUriMatch = new UriMatcher(UriMatcher.NO_MATCH);
-
-    static {
-        sUriMatch.addURI(MediaContract.CONTENT_AUTHORITY, &quot;news&quot;, NEWS);
-        sUriMatch.addURI(MediaContract.CONTENT_AUTHORITY, &quot;news/#&quot;, NEWS_ID);
-        sUriMatch.addURI(MediaContract.CONTENT_AUTHORITY, &quot;comments&quot;, COMMENTS);
-        sUriMatch.addURI(MediaContract.CONTENT_AUTHORITY, &quot;comments/#&quot;, COMMENTS_ID);
-        }
-
-//manifests.xml
-&lt;provider
-    android:authorities=&quot;com.geelaro.mysqlite.media&quot;
-    android:name=&quot;.provider.MyDataProvider&quot;
-    android:readPermission=&quot;com.geelaro.mysqlite.READ&quot;
-    android:exported=&quot;true&quot;&gt;
-</code></pre>
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -776,7 +769,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-count">2</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -787,7 +780,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">1</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

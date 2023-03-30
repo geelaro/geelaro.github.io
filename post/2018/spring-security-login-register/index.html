@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0-rc1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha256-/4UQcSmErDzPCMAiuOiWPVVsNN2s3ZY/NsmXNcj0IFc=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"geelaro.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.15.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":{"enable":false,"style":null},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="1.前言 2.准备 3. Model层 3.1 User 3.2 Role   4. 服务层 5. Web层 5.1 IndexController 5.2 UserController 6. 认证配置 7. 视图层 7.1 代码层 7.2 HTML 8. 运行验证 8.1 未登录首页 8.2 登录后首页 8.3 注册新用户 8.4 用户详情页 9.Remember me 10. 踩过的坑 10">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring Boot + Security + Thymeleaf + JPA 实现注册登录功能">
+<meta property="og:url" content="https://geelaro.github.io/post/2018/spring-security-login-register/index.html">
+<meta property="og:site_name" content="Going to Fly">
+<meta property="og:description" content="1.前言 2.准备 3. Model层 3.1 User 3.2 Role   4. 服务层 5. Web层 5.1 IndexController 5.2 UserController 6. 认证配置 7. 视图层 7.1 代码层 7.2 HTML 8. 运行验证 8.1 未登录首页 8.2 登录后首页 8.3 注册新用户 8.4 用户详情页 9.Remember me 10. 踩过的坑 10">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2018/11/07/5be1cc456f69f.png">
+<meta property="og:image" content="https://i.loli.net/2018/11/07/5be1cbf84c4c8.png">
+<meta property="og:image" content="https://i.loli.net/2018/11/07/5be1cc2f9e1b7.png">
+<meta property="og:image" content="https://i.loli.net/2018/11/07/5be1ccd6ad735.png">
+<meta property="og:image" content="https://i.loli.net/2018/11/07/5be1cc45ab162.png">
+<meta property="article:published_time" content="2018-11-06T14:22:14.000Z">
+<meta property="article:modified_time" content="2023-03-29T15:41:01.407Z">
+<meta property="article:author" content="geelaro">
+<meta property="article:tag" content="security">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2018/11/07/5be1cc456f69f.png">
+
+
+<link rel="canonical" href="https://geelaro.github.io/post/2018/spring-security-login-register/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://geelaro.github.io/post/2018/spring-security-login-register/","path":"post/2018/spring-security-login-register/","title":"Spring Boot + Security + Thymeleaf + JPA 实现注册登录功能"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Spring Boot + Security + Thymeleaf + JPA 实现注册登录功能 | Going to Fly</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Going to Fly</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1"><span class="nav-number">1.</span> <span class="nav-text"> 前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2"><span class="nav-number">2.</span> <span class="nav-text"> 准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3"><span class="nav-number">3.</span> <span class="nav-text"> 创建Model</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3.1"><span class="nav-number">3.1.</span> <span class="nav-text">User</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3.2"><span class="nav-number">3.2.</span> <span class="nav-text">Role</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4"><span class="nav-number">4.</span> <span class="nav-text"> 服务层 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5"><span class="nav-number">5.</span> <span class="nav-text"> Web层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5.1"><span class="nav-number">5.1.</span> <span class="nav-text"> IndexController</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5.2"><span class="nav-number">5.2.</span> <span class="nav-text"> UserController </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6"><span class="nav-number">6.</span> <span class="nav-text"> 认证配置 </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7"><span class="nav-number">7.</span> <span class="nav-text"> 视图层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7.1"><span class="nav-number">7.1.</span> <span class="nav-text">代码层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7.2"><span class="nav-number">7.2.</span> <span class="nav-text">HTML</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8"><span class="nav-number">8.</span> <span class="nav-text">验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8.1"><span class="nav-number">8.1.</span> <span class="nav-text"> 未登录首页</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8.2"><span class="nav-number">8.2.</span> <span class="nav-text"> 登录后首页 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8.3"><span class="nav-number">8.3.</span> <span class="nav-text"> 注册一个user</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8.4"><span class="nav-number">8.4.</span> <span class="nav-text"> 登录的用户详情页 </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9"><span class="nav-number">9.</span> <span class="nav-text"> Remember me </span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10"><span class="nav-number">10.</span> <span class="nav-text"> 踩过的坑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#10.1"><span class="nav-number">10.1.</span> <span class="nav-text"> login中thymeleaf的坑 </span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10.2"><span class="nav-number">10.2.</span> <span class="nav-text"> thymeleaf-extras-springsecurity </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11"><span class="nav-number">11.</span> <span class="nav-text"> 代码及参考文章
+
+Spring-security-login-registerSpring Boot Security下的注册登录
+</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11"><span class="nav-number">12.</span> <span class="nav-text">
+
+Spring-security-login-registerSpring Boot Security下的注册登录
+</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="geelaro"
+      src="/images/cat.png">
+  <p class="site-author-name" itemprop="name">geelaro</p>
+  <div class="site-description" itemprop="description">Personal Blog</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/geelaro" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;geelaro" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/xincainy" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;xincainy" rel="noopener me" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://geelaro.github.io/post/2018/spring-security-login-register/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/cat.png">
+      <meta itemprop="name" content="geelaro">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Going to Fly">
+      <meta itemprop="description" content="Personal Blog">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Spring Boot + Security + Thymeleaf + JPA 实现注册登录功能 | Going to Fly">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring Boot + Security + Thymeleaf + JPA 实现注册登录功能
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2018-11-06 22:22:14" itemprop="dateCreated datePublished" datetime="2018-11-06T22:22:14+08:00">2018-11-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2023-03-29 23:41:01" itemprop="dateModified" datetime="2023-03-29T23:41:01+08:00">2023-03-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Spring-Boot/" itemprop="url" rel="index"><span itemprop="name">Spring Boot</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <ul>
+<li><a href="#1">1.前言</a></li>
+<li><a href="#2">2.准备</a></li>
+<li><a href="#3">3. Model层</a><ul>
+<li><a href="#3.1">3.1 User</a></li>
+<li><a href="#3.2">3.2 Role</a></li>
+</ul>
+</li>
+<li><a href="#4">4. 服务层</a></li>
+<li><a href="#5">5. Web层</a></li>
+<li><a href="#5.1">5.1 IndexController</a></li>
+<li><a href="#5.2">5.2 UserController</a></li>
+<li><a href="#6">6. 认证配置</a></li>
+<li><a href="#7">7. 视图层</a></li>
+<li><a href="#7.1">7.1 代码层</a></li>
+<li><a href="#7.2">7.2 HTML</a></li>
+<li><a href="#8">8. 运行验证</a></li>
+<li><a href="#8.1">8.1 未登录首页</a></li>
+<li><a href="#8.2">8.2 登录后首页</a></li>
+<li><a href="#8.3">8.3 注册新用户</a></li>
+<li><a href="#8.4">8.4 用户详情页</a></li>
+<li><a href="#9">9.Remember me</a></li>
+<li><a href="#10">10. 踩过的坑</a><ul>
+<li><a href="#10.1">10.1 thymeleaf的坑</a></li>
+<li><a href="#10.2">10.2 thymeleaf-extrans-springsecurity</a></li>
+</ul>
+</li>
+<li><a href="#11">11.代码及参考文献</a></li>
+</ul>
+<h2 id="1"> 前言</h2>
+
+<p>网络上关于Spring Security实现登录注册的文章很多，但大多存在2个问题，一是讲的不清不楚，看完文章还是没明白怎么使用；二是比较陈旧。本文在前文基础上做了些的改进，尽量讲清楚如何使用。（请注意，本文是入门教程，只讲如何使用，不涉及源码分析）</p>
+<h2 id="2"> 准备</h2>
+
+<ul>
+<li>IDEA</li>
+<li>Spring Boot 2.1.0</li>
+<li>Spring Security 5.1</li>
+<li>Thymeleaf 3.0</li>
+<li>JDK 1.8</li>
+<li>Maven 3.5.2<br> IDEA 利用Spring Initializr创建工程spring-security-login-register，添加依赖。</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">xmlns</span>=<span class="string">&quot;http://maven.apache.org/POM/4.0.0&quot;</span> <span class="attr">xmlns:xsi</span>=<span class="string">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span></span></span><br><span class="line"><span class="tag">	<span class="attr">xsi:schemaLocation</span>=<span class="string">&quot;http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd&quot;</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="name">modelVersion</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.geelaro<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>register<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">version</span>&gt;</span>0.0.1-SNAPSHOT<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">packaging</span>&gt;</span>jar<span class="tag">&lt;/<span class="name">packaging</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">name</span>&gt;</span>register<span class="tag">&lt;/<span class="name">name</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">description</span>&gt;</span>Demo project for Spring Boot<span class="tag">&lt;/<span class="name">description</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">parent</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.0.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">relativePath</span>/&gt;</span> <span class="comment">&lt;!-- lookup parent from repository --&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">parent</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">properties</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">project.build.sourceEncoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">project.build.sourceEncoding</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">project.reporting.outputEncoding</span>&gt;</span>UTF-8<span class="tag">&lt;/<span class="name">project.reporting.outputEncoding</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="name">java.version</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line">	<span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-data-jpa<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-security<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-thymeleaf<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.thymeleaf.extras<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>thymeleaf-extras-springsecurity5<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>mysql<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>mysql-connector-java<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>runtime<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.security<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-security-test<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">scope</span>&gt;</span>test<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">build</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">plugins</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;<span class="name">plugin</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">				<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">			<span class="tag">&lt;/<span class="name">plugin</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;/<span class="name">plugins</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">build</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>其他具体配置请在文末看代码。</p>
+<h2 id="3"> 创建Model</h2>
+先创建一个User实体，再创建一个Role。
+<h3 id="3.1">User</h3>
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">User</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Id</span></span><br><span class="line">    <span class="meta">@GeneratedValue(strategy = GenerationType.AUTO)</span></span><br><span class="line">    <span class="keyword">private</span> Long id;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Column(nullable = false,unique = true)</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Column(nullable = false)</span></span><br><span class="line">    <span class="keyword">private</span> String passWd;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Column(nullable = false,unique = true)</span></span><br><span class="line">    <span class="keyword">private</span> String email;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Column(nullable = false)</span></span><br><span class="line">    <span class="keyword">private</span> Long createTime;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Column(nullable = false)</span></span><br><span class="line">    <span class="keyword">private</span> Long lastModifyTime;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="meta">@ManyToMany(fetch = FetchType.EAGER)</span></span><br><span class="line">    <span class="meta">@JoinTable(name = &quot;users_roles&quot;, joinColumns = @JoinColumn(name = &quot;user_id&quot;, referencedColumnName = &quot;id&quot;), inverseJoinColumns = @JoinColumn(name = &quot;role_id&quot;, referencedColumnName = &quot;id&quot;))</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;Role&gt; roles;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//省略setter和getter 方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="3.2">Role</h3>
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Entity</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Role</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Id</span></span><br><span class="line">    <span class="meta">@GeneratedValue(strategy = GenerationType.AUTO)</span></span><br><span class="line">    <span class="keyword">private</span> Long id;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ManyToMany(mappedBy = &quot;roles&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Collection&lt;User&gt; users;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> Long <span class="title function_">getId</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//省略setter和getter 方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同时还需要再创建一个data transfer object (DTO)表单，用作web和服务层中介。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UserDto</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotEmpty</span></span><br><span class="line">    <span class="meta">@NotNull</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotEmpty</span></span><br><span class="line">    <span class="meta">@NotNull</span></span><br><span class="line">    <span class="meta">@Email</span></span><br><span class="line">    <span class="keyword">private</span> String email;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotEmpty</span></span><br><span class="line">    <span class="meta">@NotNull</span></span><br><span class="line">    <span class="meta">@Size(min = 6,max = 20)</span></span><br><span class="line">    <span class="keyword">private</span> String passWd;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@NotEmpty</span></span><br><span class="line">    <span class="meta">@NotNull</span></span><br><span class="line">    <span class="meta">@Size(min = 6,max = 20)</span></span><br><span class="line">    <span class="keyword">private</span> String matchPassWd;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//省略setter和getter方法</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>@NotEmpty 限制不为空，@Size限制了密码最短6位，最长20位。</p>
+<h2 id="4"> 服务层 </h2>
+
+
+<p>dao层UserRepository、RoleRepository接口，直接继承JpaRepository.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># User</span><br><span class="line">public interface UserRepository extends JpaRepository&lt;User,Long&gt; &#123;</span><br><span class="line"></span><br><span class="line">    User findByNameOrEmail(String name,String email);</span><br><span class="line">    User findByEmail(String email);</span><br><span class="line">    User findByName(String name);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"># Role</span><br><span class="line">public interface RoleRepository extends JpaRepository&lt;Role,Long&gt; &#123;</span><br><span class="line">    Role findByName(String name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>UserService 接口</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public interface IUserService &#123;</span><br><span class="line"></span><br><span class="line">    User save(User user);</span><br><span class="line">    User findByEmail(String email);</span><br><span class="line">    User findByName(String name);</span><br><span class="line">    boolean checkUserByName(String name);</span><br><span class="line">    boolean checkUserByEmail(String email);</span><br><span class="line">    </span><br></pre></td></tr></table></figure>
+<p>UserService接口实现</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">@Service</span><br><span class="line">public class UserService implements IUserService &#123;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private UserRepository userRepository;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private RoleRepository roleRepository;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private BCryptPasswordEncoder passwordEncoder;</span><br><span class="line"></span><br><span class="line">    @Transactional</span><br><span class="line">    @Override</span><br><span class="line">    public User save(User user) &#123;</span><br><span class="line">        return userRepository.save(user);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public User findByEmail(String email) &#123;</span><br><span class="line">        return userRepository.findByEmail(email);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public User findByName(String name) &#123;</span><br><span class="line">        return userRepository.findByName(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean checkUserByName(String name) &#123;</span><br><span class="line">        User user = findByName(name);</span><br><span class="line">        return user != null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public boolean checkUserByEmail(String email) &#123;</span><br><span class="line">        User user = findByEmail(email);</span><br><span class="line">        return user != null;</span><br><span class="line">    &#125;</span><br><span class="line">    /**</span><br><span class="line">     * 创建一个新的user,角色为ROLE_USER</span><br><span class="line">     * @param userDto</span><br><span class="line">     * @return</span><br><span class="line">     */ </span><br><span class="line">    public User registerNewAccount(UserDto userDto) &#123;</span><br><span class="line">        User user = new User();</span><br><span class="line">        user.setEmail(userDto.getEmail());</span><br><span class="line">        user.setName(userDto.getName());</span><br><span class="line">        user.setPassWd(passwordEncoder.encode(userDto.getPassWd()));</span><br><span class="line">        user.setRoles(Arrays.asList(roleRepository.findByName(&quot;ROLE_USER&quot;)));</span><br><span class="line">        user.setCreateTime(new Date().getTime());</span><br><span class="line">        user.setLastModifyTime(new Date().getTime());</span><br><span class="line">        return save(user);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="5"> Web层</h2>
+
+<p>写了4个页面，首页”&#x2F;“，注册”&#x2F;register”、登录”&#x2F;login”，以及登录后的用户信息详情页”&#x2F;userInfo”。把他们分别放到两个controller中，method为get的放到IndexController，需要数据处理的放在UserController中。</p>
+<h3 id="5.1"> IndexController</h3>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">@Controller</span><br><span class="line">public class IndexController &#123;</span><br><span class="line">    @GetMapping(&quot;/&quot;)</span><br><span class="line">    public String index()&#123;</span><br><span class="line">        return &quot;index&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @GetMapping(&quot;/register&quot;)</span><br><span class="line">    public String createUser(Model model)&#123;</span><br><span class="line">        model.addAttribute(&quot;user&quot;,new UserDto());</span><br><span class="line">        return &quot;register&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @GetMapping(&quot;/login&quot;)</span><br><span class="line">    public String login(Model model)&#123;</span><br><span class="line">        model.addAttribute(&quot;user&quot;,new UserDto());</span><br><span class="line">        return &quot;login&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @GetMapping(&quot;/login?error&quot;)</span><br><span class="line">    public String loginError(Model model)&#123;</span><br><span class="line">        model.addAttribute(&quot;loginError&quot;,true);</span><br><span class="line">        return &quot;login&quot;;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="5.2"> UserController </h3>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">@Controller</span><br><span class="line">public class UserController &#123;</span><br><span class="line"></span><br><span class="line">    private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private UserService userService;</span><br><span class="line"></span><br><span class="line">    @PostMapping(&quot;/register&quot;)</span><br><span class="line">    public String createUser(@ModelAttribute(&quot;user&quot;) @Valid UserDto userDto, BindingResult result, Model model) &#123;</span><br><span class="line"></span><br><span class="line">        if (result.hasErrors()) &#123;</span><br><span class="line"></span><br><span class="line">            return &quot;register&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        //check name 是否已使用</span><br><span class="line">        if (userService.checkUserByName(userDto.getName())) &#123;</span><br><span class="line">            result.rejectValue(&quot;name&quot;, &quot;error.user&quot;, &quot;name已使用&quot;);</span><br><span class="line">            logger.info(&quot;name已存在！&quot;);</span><br><span class="line">            return &quot;register&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        //check email 是否已注册。</span><br><span class="line">        if (userService.checkUserByEmail(userDto.getEmail())) &#123;</span><br><span class="line">            result.rejectValue(&quot;email&quot;, &quot;error.user&quot;, &quot;Email已注册&quot;);</span><br><span class="line">            logger.info(&quot;email已注册！&quot;);</span><br><span class="line">            return &quot;register&quot;;</span><br><span class="line">        &#125;</span><br><span class="line">        //check password equal</span><br><span class="line">        if (!checkPassWordUniform(userDto.getPassWd(),userDto.getMatchPassWd()))&#123;</span><br><span class="line">            result.rejectValue(&quot;passWd&quot;,&quot;error.user&quot;,&quot;两次输入密码不一致&quot;);</span><br><span class="line">            return &quot;register&quot;;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        try &#123;</span><br><span class="line">            createUserAccount(userDto);</span><br><span class="line">        &#125; catch (DataIntegrityViolationException e) &#123;</span><br><span class="line">            result.rejectValue(&quot;email&quot;, &quot;error.user&quot;,&quot;Email already exists.&quot;);</span><br><span class="line">            result.rejectValue(&quot;name&quot;, &quot;error.user&quot;,&quot;Name already exists&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        return &quot;redirect:/userInfo&quot;;</span><br><span class="line">    &#125;</span><br><span class="line">    @GetMapping(&quot;/userInfo&quot;)</span><br><span class="line">    public String userInfo(Model model) &#123;</span><br><span class="line">        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();</span><br><span class="line">        String name = userDetails.getUsername();</span><br><span class="line"></span><br><span class="line">        String date = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss&quot;).format(new Date());</span><br><span class="line"></span><br><span class="line">        model.addAttribute(&quot;name&quot;, name);</span><br><span class="line">        model.addAttribute(&quot;date&quot;, date);</span><br><span class="line">        return &quot;userInfo&quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private User createUserAccount(UserDto userDto) &#123;</span><br><span class="line">        User registered = null;</span><br><span class="line"></span><br><span class="line">        registered = userService.registerNewAccount(userDto);</span><br><span class="line">        return registered;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private boolean checkPassWordUniform(String passWd,String matchPassWd)&#123;</span><br><span class="line">        return passWd.equals(matchPassWd);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>注册时，使用@Valid注解启用表单验证，因为整体比较简单，自定义验证我也写在了controller中。最好的是另外写一个类实现Validator接口，在类中自定义表单验证。</p>
+<p>这样注册功能就已经完成了，接下来来看登录。</p>
+<h2 id="6"> 认证配置 </h2>
+Spring Security是自带登录逻辑的，我们只需要配置和自定义登录界面，其他的交给Security处理。新建一个WebSecurityConfig 继承 WebSecurityConfigurerAdapter类。
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line">@Configuration</span><br><span class="line">@EnableWebSecurity</span><br><span class="line">public class WebSecurityConfig extends WebSecurityConfigurerAdapter &#123;</span><br><span class="line">	@Autowired</span><br><span class="line">    private DataSource dataSource;</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private CustomUserDetailService userDetailService;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * 密码加密</span><br><span class="line">     * @return</span><br><span class="line">     */</span><br><span class="line">    @Bean</span><br><span class="line">    public BCryptPasswordEncoder passwordEncoder()&#123;</span><br><span class="line">        return new BCryptPasswordEncoder();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * auth的方式</span><br><span class="line">     * @param auth</span><br><span class="line">     * @throws Exception</span><br><span class="line">     */</span><br><span class="line">    @Override</span><br><span class="line">    protected void configure(AuthenticationManagerBuilder auth) throws Exception &#123;</span><br><span class="line">        auth.userDetailsService(userDetailService).passwordEncoder(passwordEncoder());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    protected void configure(HttpSecurity http) throws Exception &#123;</span><br><span class="line">        http</span><br><span class="line">                .csrf().disable()  //csrf不可用</span><br><span class="line">                .authorizeRequests()</span><br><span class="line">                .antMatchers(&quot;/static/**&quot;,&quot;/css/**&quot;).permitAll() //访问允许静态文件</span><br><span class="line">                .antMatchers(&quot;/&quot;,&quot;/register&quot;).permitAll() //允许访问首页和注册页</span><br><span class="line">                .anyRequest().authenticated()</span><br><span class="line">                .and()</span><br><span class="line">                .formLogin().loginPage(&quot;/login&quot;).failureUrl(&quot;/login?error&quot;)//指定登录页和登录失败页</span><br><span class="line">                .defaultSuccessUrl(&quot;/userInfo&quot;) //登录成功跳转页</span><br><span class="line">                .usernameParameter(&quot;name&quot;)</span><br><span class="line">                .passwordParameter(&quot;passWd&quot;)</span><br><span class="line">                .and()</span><br><span class="line">                .logout().logoutSuccessUrl(&quot;/login&quot;).permitAll() //退出登录跳转页</span><br><span class="line">                .and()</span><br><span class="line">                .rememberMe() //remember me</span><br><span class="line">                .tokenRepository(tokenRepository()) //存储</span><br><span class="line">                .userDetailsService(userDetailService)</span><br><span class="line">                .tokenValiditySeconds(24*60*60);//token有效期24h </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    public PersistentTokenRepository tokenRepository()&#123;</span><br><span class="line">        JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();</span><br><span class="line">        db.setDataSource(this.dataSource);</span><br><span class="line">        return db;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>这个配置比较繁琐，我在比较难缠的地方加了注解。Spring Security要求如果要自定义账号密码，需要实现自带的UserDetailService接口，用户验证当前用户。其中CustomUserDetailService就是我们实现的类，而UserDetails 是 Spring 用来记录当前用户，就是用户登录完之后，系统里保存就是当前这个用户的 UserDetails，所以可以在不同的用户端显示不同的内容。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">@Service</span><br><span class="line">public class CustomUserDetailService implements UserDetailsService &#123;</span><br><span class="line">    private final static Logger logger = LogManager.getLogger(CustomUserDetailService.class);</span><br><span class="line"></span><br><span class="line">    @Autowired</span><br><span class="line">    private UserRepository userRepository;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException &#123;</span><br><span class="line">        User user = userRepository.findByName(name);</span><br><span class="line"></span><br><span class="line">        if (user==null)&#123;</span><br><span class="line">            logger.error(&quot;Not Found name &quot;+ name);</span><br><span class="line">            throw new UsernameNotFoundException(&quot;Not Found name &quot;+ name);</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        return new org.springframework.security.core.userdetails.User(</span><br><span class="line">            user.getName(),</span><br><span class="line">                user.getPassWd(),</span><br><span class="line">                getAuthorities(user.getRoles()));</span><br><span class="line">    &#125;</span><br><span class="line">    private static List&lt;GrantedAuthority&gt; getAuthorities (List&lt;Role&gt; roles) &#123;</span><br><span class="line"></span><br><span class="line">        List&lt;GrantedAuthority&gt; authorities = new ArrayList&lt;&gt;();</span><br><span class="line">        for (Role role:roles)&#123;</span><br><span class="line">            authorities.add(new SimpleGrantedAuthority(role.getName()));</span><br><span class="line">        &#125;</span><br><span class="line">        return authorities;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="7"> 视图层</h2>
+
+<p>获取当前用户有2个方法：</p>
+<h3 id="7.1">代码层</h3>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();</span><br><span class="line">String name = userDetails.getUsername();</span><br></pre></td></tr></table></figure>
+<h3 id="7.2">HTML</h3>
+
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">    &lt;p&gt;登录的用户名 : &lt;strong class=&quot;reg&quot; sec:authentication=&quot;name&quot;&gt;&lt;/strong&gt;</span><br><span class="line">    &lt;/p&gt;</span><br><span class="line">    登录成功的用户角色 :</span><br><span class="line">    &lt;em class=&quot;reg&quot; sec:authentication=&quot;principal.authorities&quot;&gt;&lt;/em&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="8">验证</h2>
+
+<p>首先在表Role插入两条数据，”ROLE_USER”和”ROLE_ADMIN”，然后启动程序。<br><img src="https://i.loli.net/2018/11/07/5be1cc456f69f.png" alt="role"></p>
+<h3 id="8.1"> 未登录首页</h3>
+
+<p><img src="https://i.loli.net/2018/11/07/5be1cbf84c4c8.png" alt="index"></p>
+<h3 id="8.2"> 登录后首页 </h3>
+
+<p><img src="https://i.loli.net/2018/11/07/5be1cc2f9e1b7.png" alt="indexlogin"></p>
+<h3 id="8.3"> 注册一个user</h3>
+
+<p><img src="https://i.loli.net/2018/11/07/5be1ccd6ad735.png" alt="register"><br>表单验证成功。</p>
+<h3 id="8.4"> 登录的用户详情页 </h3>
+
+<p><img src="https://i.loli.net/2018/11/07/5be1cc45ab162.png" alt="userInfo"></p>
+<h2 id="9"> Remember me </h2>
+Spring Security 有remember me功能，使用十分简单。
+前端login.html中添加 `<input type="checkbox" name="remember-me"> `，后端WebSecurityConfig添加一个存储方法即可。
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">  public PersistentTokenRepository tokenRepository()&#123;</span><br><span class="line">        //存储内存，不推荐</span><br><span class="line">//        InMemoryTokenRepositoryImpl memory =new InMemoryTokenRepositoryImpl();</span><br><span class="line">//        return memory;</span><br><span class="line">        /** 存档到数据库中 **/</span><br><span class="line">        JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();</span><br><span class="line">        db.setDataSource(this.dataSource);</span><br><span class="line">        return db;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>选择存储到数据库时，需要手动建表”persistent_logins”，建表sql:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">DROP TABLE IF EXISTS `persistent_logins`;</span><br><span class="line">CREATE TABLE `persistent_logins` (</span><br><span class="line">  `username` varchar(64) NOT NULL,</span><br><span class="line">  `series` varchar(64) NOT NULL,</span><br><span class="line">  `token` varchar(64) NOT NULL,</span><br><span class="line">  `last_used` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,</span><br><span class="line">  PRIMARY KEY (`series`)</span><br><span class="line">) ENGINE=InnoDB DEFAULT CHARSET=utf8;</span><br><span class="line">SET FOREIGN_KEY_CHECKS=1;</span><br></pre></td></tr></table></figure>
+<h2 id="10"> 踩过的坑</h2>
+
+<h3 id="10.1"> login中thymeleaf的坑 </h3>
+如果login.html中form表单input 标签中使用的th:field="*{}"，那么在WebSecurityConfig一定要添加这"usernameParameter"和"passwordParameter"，不然登录后报错"name not found".
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">   protected void configure(HttpSecurity http) throws Exception &#123;</span><br><span class="line">       http</span><br><span class="line">          ...........</span><br><span class="line">               .formLogin().loginPage(&quot;/login&quot;).failureUrl(&quot;/login?error&quot;)</span><br><span class="line">               .defaultSuccessUrl(&quot;/userInfo&quot;)</span><br><span class="line">              .usernameParameter(&quot;name&quot;) </span><br><span class="line">               .passwordParameter(&quot;passWd&quot;)</span><br></pre></td></tr></table></figure>
+<p>如果使用的是<code>&lt;input type=password name =&quot;password /&gt;</code>，则配置类中不需要添加这两个。</p>
+<h3 id="10.2"> thymeleaf-extras-springsecurity </h3>
+Spring Boot 2.0默认使用的Spring Security版本是5.x，根据官网[thymeleaf-extras-springsecurity](https://github.com/thymeleaf/thymeleaf-extras-springsecurity)
+
+<blockquote>
+<p>thymeleaf-extras-springsecurity3 for integration with Spring Security 3.x<br>thymeleaf-extras-springsecurity4 for integration with Spring Security 4.x<br>thymeleaf-extras-springsecurity5 for integration with Spring Security 5.x</p>
+</blockquote>
+<p>选择的thymeleaf-extras-springsecurity版本应是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">	    &lt;groupId&gt;org.thymeleaf.extras&lt;/groupId&gt;</span><br><span class="line">		&lt;artifactId&gt;thymeleaf-extras-springsecurity5&lt;/artifactId&gt;</span><br><span class="line">&lt;/dependency&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="11"> 代码及参考文章<h2>
+
+<p><a target="_blank" rel="noopener" href="https://github.com/fqzero/spring-security-login-register">Spring-security-login-register</a><br><a target="_blank" rel="noopener" href="https://blog.pwxcoo.com/2017/12/24/Spring%20Boot%20Security%E4%B8%8B%E7%9A%84%E6%B3%A8%E5%86%8C%E7%99%BB%E5%BD%95/">Spring Boot Security下的注册登录</a></p>
+</h2></h2>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/security/" rel="tag"># security</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/2018/change-git-remote-url/" rel="prev" title="git修改远程仓库地址">
+                  <i class="fa fa-chevron-left"></i> git修改远程仓库地址
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/2018/docker-install-mongodb/" rel="next" title="docker安装MongoDB">
+                  docker安装MongoDB <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">geelaro</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/mist/" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

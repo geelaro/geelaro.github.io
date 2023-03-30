@@ -227,9 +227,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h3 id="先编写Dockerfile"><a href="#先编写Dockerfile" class="headerlink" title="先编写Dockerfile"></a>先编写Dockerfile</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">FROM python:3.6</span><br><span class="line">ENV PYTHONUNBUFFERED 1</span><br><span class="line">RUN mkdir /code</span><br><span class="line">WORKDIR /code</span><br><span class="line">ADD requirements.txt /code/</span><br><span class="line">RUN pip install -r requirements.txt</span><br><span class="line">ADD . /code/</span><br></pre></td></tr></table></figure>
-
-
-<h3 id="编写docker-compose文件"><a href="#编写docker-compose文件" class="headerlink" title="编写docker-compose文件"></a>编写docker-compose文件</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">version: &#x27;2.0&#x27;</span><br><span class="line">services:</span><br><span class="line"></span><br><span class="line">   web:</span><br><span class="line">    build: .</span><br><span class="line">    command: bash -c &quot;python manage.py makemigrations &amp;&amp;</span><br><span class="line">                      python manage.py migrate &amp;&amp;</span><br><span class="line">                      python manage.py runserver 0.0.0.0:8000&quot;</span><br><span class="line">    volumes:</span><br><span class="line">      - .:/code</span><br><span class="line">    ports:</span><br><span class="line">      - &quot;8000:8000&quot;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2018/docker-deploy-django/#more" rel="contents">
@@ -322,9 +319,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name mongodb -p 27017:27017 -v /data/db:/data/db mongo:lastest --auth</span><br></pre></td></tr></table></figure>
-
-<p>进入MongoDB容器内部</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it mongodb(容器名) mongo admin</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2018/docker-install-mongodb/#more" rel="contents">
@@ -446,9 +440,6 @@
 <li><a href="#11">11.代码及参考文献</a></li>
 </ul>
 <h2 id="1"> 前言</h2>
-
-<p>网络上关于Spring Security实现登录注册的文章很多，但大多存在2个问题，一是讲的不清不楚，看完文章还是没明白怎么使用；二是比较陈旧。本文在前文基础上做了些的改进，尽量讲清楚如何使用。（请注意，本文是入门教程，只讲如何使用，不涉及源码分析）</p>
-<h2 id="2"> 准备</h2>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2018/spring-security-login-register/#more" rel="contents">
@@ -534,8 +525,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h3 id="共有3种方法"><a href="#共有3种方法" class="headerlink" title="共有3种方法"></a>共有3种方法</h3><h4 id="1-直接修改config文件"><a href="#1-直接修改config文件" class="headerlink" title="1.直接修改config文件"></a>1.直接修改config文件</h4><p>这是最直接的方法，打开工程目录下的.git, 找到config文本，修改url.</p>
-<h4 id="2-修改命令"><a href="#2-修改命令" class="headerlink" title="2. 修改命令"></a>2. 修改命令</h4>
+          <h3 id="共有3种方法"><a href="#共有3种方法" class="headerlink" title="共有3种方法"></a>共有3种方法</h3><h4 id="1-直接修改config文件"><a href="#1-直接修改config文件" class="headerlink" title="1.直接修改config文件"></a>1.直接修改config文件</h4>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2018/change-git-remote-url/#more" rel="contents">
@@ -628,7 +618,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h3 id="原题"><a href="#原题" class="headerlink" title="原题"></a>原题</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">Given a binary tree, find its maximum depth.</span><br><span class="line"></span><br><span class="line">The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.</span><br><span class="line"></span><br><span class="line">For example:</span><br><span class="line">Given binary tree [3,9,20,null,null,15,7],</span><br><span class="line"></span><br><span class="line">    3</span><br><span class="line">   / \</span><br><span class="line">  9  20</span><br><span class="line">    /  \</span><br><span class="line">   15   7</span><br><span class="line">return its depth = 3.</span><br></pre></td></tr></table></figure>
-<h4 id="递归方法"><a href="#递归方法" class="headerlink" title="递归方法"></a>递归方法</h4><p>用递归实现，先求其左子树的深度和右子树的深度，递归出口为当前节点为null。然后在比较左右大小，选择最大的一边的值返回。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2018/maximum-depth-binary-tree/#more" rel="contents">
@@ -715,8 +704,7 @@
     
     <div class="post-body" itemprop="articleBody">
           <p>单例模式是Java中最常见也是面试经常被问到的一种设计模式，本文详细列出了单例模式的几种写法。</p>
-<h3 id="懒汉式，双重校验锁"><a href="#懒汉式，双重校验锁" class="headerlink" title="懒汉式，双重校验锁"></a>懒汉式，双重校验锁</h3><p>双重校验，多个线程下调用，只会创建一个实例。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">public class Singleton &#123;</span><br><span class="line"></span><br><span class="line">	private static Singleton instance;</span><br><span class="line"></span><br><span class="line">	private Singleton() &#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	public static Singleton getInstance() &#123;</span><br><span class="line">		if (instance == null) &#123;</span><br><span class="line">			synchronized (Singleton.class) &#123;</span><br><span class="line">				if (instance == null) &#123;</span><br><span class="line">					instance = new Singleton();</span><br><span class="line"></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		return instance;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="懒汉式，双重校验锁"><a href="#懒汉式，双重校验锁" class="headerlink" title="懒汉式，双重校验锁"></a>懒汉式，双重校验锁</h3>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2018/singleton/#more" rel="contents">
@@ -809,7 +797,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h1 id="Sensor"><a href="#Sensor" class="headerlink" title="Sensor"></a>Sensor</h1><p>传感器已经是Android手机必备技术，没有传感器可以称的是老古董。下面介绍几个比较常用的传感器。</p>
-<h2 id="SensorManager"><a href="#SensorManager" class="headerlink" title="SensorManager"></a>SensorManager</h2><p>使用传感器需要先获取SensorManager 实例，它是系统所有传感器的管理器。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2018/sensor/#more" rel="contents">
@@ -896,8 +883,6 @@
     
     <div class="post-body" itemprop="articleBody">
           <h4 id="原题："><a href="#原题：" class="headerlink" title="原题："></a>原题：</h4><p>Given an array of integers, return indices of the two numbers such that they add up to a specific target.</p>
-<p>You may assume that each input would have exactly one solution, and you may not use the same element twice.</p>
-<p>Example:</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2018/Two-Sum/#more" rel="contents">
@@ -989,8 +974,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h3 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h3><h4 id="概念："><a href="#概念：" class="headerlink" title="概念："></a>概念：</h4><p>程序调用自身的编程技巧称为递归,是函数自己调用自己.<br>一个函数在其定义中直接或间接调用自身的一种方法,它通常把一个大型的复杂的问题转化为一个与原问题相似的规模较小的问题来解决,可以极大的减少代码量.递归的能力在于用有限的语句来定义对象的无限集合.</p>
-<p>递归分为两个阶段：</p>
+          <h3 id="递归"><a href="#递归" class="headerlink" title="递归"></a>递归</h3><h4 id="概念："><a href="#概念：" class="headerlink" title="概念："></a>概念：</h4>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2017/Recursion-and-Iteration/#more" rel="contents">
@@ -1076,8 +1060,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h3 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h3><h4 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h4><p>在要排序的一组数中，假设前面(n-1) [n&gt;&#x3D;2]个数已经是排好顺序的，现在要把第n个数插到前面的有序数中，使得这n个数也是排好顺序的。如此反复循环，直到全部排好顺序。</p>
-<h4 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h4>
+          <h3 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h3><h4 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h4>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/2017/Several-sorting-methods-of-Java-implementation/#more" rel="contents">
